@@ -27,7 +27,18 @@ const MESSAGE_SENTENCES = [
 ];
 
 const DESCRIPTIONS = [
-  ''
+  'Скучаю',
+  'Summertime',
+  'Soon',
+  'На даче',
+  'Work hard - party harder',
+  'Личное - не публичное',
+  'Ведь, если звезды зажигают — значит — это кому-нибудь нужно?',
+  'Значит — кто-то называет эти плево́чки жемчужиной?',
+  'If you only read the books that everyone else is reading, you can only think what everyone else is thinking.',
+  'Перед великим умом я склоняю голову, перед великим сердцем — преклоняю колени.',
+  'Избыток вкуса убивает вкус',
+  'Будь загадкою для кого-то. О побочках всё равно прочитаю на обороте',
 ];
 
 const getRandomInteger = (a, b) => {
@@ -80,7 +91,11 @@ const createMessage = () => {
   return message.join(' ');
 };
 
-const createComment = (generateCommentId) => (
+const generatePhotoId = createRandomIdFromRangeGenerator(1, 25);
+const generateUrlId = createRandomIdFromRangeGenerator(1, 25);
+const generateCommentId = createRandomIdFromRangeGenerator(1, Number.MAX_SAFE_INTEGER);
+
+const createComment = (/*generateCommentId*/) => (
   {
     id: generateCommentId(),
     avatar: `img/avatar-${getRandomInteger(1, 6).toString()}.svg`,
@@ -89,24 +104,22 @@ const createComment = (generateCommentId) => (
   }
 );
 
-const createPost = (generatePhotoId, generateUrlId, generateCommentId) => (
+const createPost = (/*generatePhotoId, generateUrlId, generateCommentId*/) => (
   {
     id: generatePhotoId(),
     url: `photos/${generateUrlId().toString()}.jpg`,
-    description: '',
+    description: getRandomArrayElement(DESCRIPTIONS),
     likes: getRandomInteger(15, 200),
-    comments: Array.from({length: getRandomInteger(0, 30)}, createComment(generateCommentId)),
+    comments: Array.from({length: getRandomInteger(0, 30)}, createComment/*generateCommentId*/),
   }
 );
 
 //const setOfPosts = Array.from({length: 2}, createPost);
 //console.log(setOfPosts);
-const generatePhotoId = createRandomIdFromRangeGenerator(1, 25);
-const generateUrlId = createRandomIdFromRangeGenerator(1, 25);
-const generateCommentId = createRandomIdFromRangeGenerator(1, 10/*Number.MAX_SAFE_INTEGER*/);
 
-for (let i = 0; i < 10; i++){
-  //console.log(createPost(generatePhotoId, generateUrlId, generateCommentId));
-  console.log(createComment(generateCommentId));
+
+for (let i = 0; i < 7; i++){
+  console.log(createPost()/*generatePhotoId, generateUrlId, generateCommentId*/);
+  //console.log(createComment(generateCommentId));
 }
 
