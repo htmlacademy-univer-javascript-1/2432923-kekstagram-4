@@ -38,18 +38,35 @@ const getRandomInteger = (a, b) => {
   return Math.floor(result);
 };
 
-const createRandomIdFromRangeGenerator = (min, max) => {
+// const createRandomIdFromRangeGenerator = (min, max) => {
+//   const previousValues = [];
+
+//   return function () {
+//     let currentValue = getRandomInteger(min, max);
+//     while (previousValues.includes(currentValue)) {
+//       currentValue = getRandomInteger(min, max);
+//     }
+//     previousValues.push(currentValue);
+//     return currentValue;
+//   };
+// };
+
+function createRandomIdFromRangeGenerator (min, max) {
   const previousValues = [];
 
   return function () {
     let currentValue = getRandomInteger(min, max);
+    if (previousValues.length >= (max - min + 1)) {
+      console.error(`Перебраны все числа из диапазона от ${min} до ${max}`);
+      return null;
+    }
     while (previousValues.includes(currentValue)) {
       currentValue = getRandomInteger(min, max);
     }
     previousValues.push(currentValue);
     return currentValue;
   };
-};
+}
 
 const getRandomArrayElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
 
@@ -63,35 +80,33 @@ const createMessage = () => {
   return message.join(' ');
 };
 
-const createComment = () => {
-  const generateCommentId = createRandomIdFromRangeGenerator(1, Number.MAX_SAFE_INTEGER);
-
-  return {
+const createComment = (generateCommentId) => (
+  {
     id: generateCommentId(),
     avatar: `img/avatar-${getRandomInteger(1, 6).toString()}.svg`,
     message: createMessage(),
     name : getRandomArrayElement(NAMES),
-  };
-};
+  }
+);
 
-
-const createPost = () => {
-  const generatePhotoId = createRandomIdFromRangeGenerator(1, 25);
-  const generateUrlId = createRandomIdFromRangeGenerator(1, 25);
-
-  return {
+const createPost = (generatePhotoId, generateUrlId, generateCommentId) => (
+  {
     id: generatePhotoId(),
     url: `photos/${generateUrlId().toString()}.jpg`,
     description: '',
     likes: getRandomInteger(15, 200),
-    comments: Array.from({length: getRandomInteger(0, 30)}, createComment),
-  };
-};
+    comments: Array.from({length: getRandomInteger(0, 30)}, createComment(generateCommentId)),
+  }
+);
 
 //const setOfPosts = Array.from({length: 2}, createPost);
 //console.log(setOfPosts);
-for (let i = 0; i < 30; i++){
+const generatePhotoId = createRandomIdFromRangeGenerator(1, 25);
+const generateUrlId = createRandomIdFromRangeGenerator(1, 25);
+const generateCommentId = createRandomIdFromRangeGenerator(1, 10/*Number.MAX_SAFE_INTEGER*/);
 
-  console.log(createPost());
+for (let i = 0; i < 10; i++){
+  //console.log(createPost(generatePhotoId, generateUrlId, generateCommentId));
+  console.log(createComment(generateCommentId));
 }
 
