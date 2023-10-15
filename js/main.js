@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const NAMES = [
   'Александр',
   'Михаил',
@@ -55,7 +54,6 @@ const createRandomIdFromRangeGenerator = (min, max) => {
   return function () {
     let currentValue = getRandomInteger(min, max);
     if (previousValues.length >= (max - min + 1)) {
-      console.error(`Перебраны все числа из диапазона от ${min} до ${max}`);
       return null;
     }
     while (previousValues.includes(currentValue)) {
@@ -101,8 +99,5 @@ const createPost = () => (
   }
 );
 
-for (let i = 0; i < 7; i++){
-  console.log(createPost()/*generatePhotoId, generateUrlId, generateCommentId*/);
-  //console.log(createComment(generateCommentId));
-}
+const setOfPosts = Array.from({length: 25}, createPost);
 
