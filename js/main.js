@@ -1,3 +1,32 @@
+const PhotoID = {
+  MIN: 1,
+  MAX: 25
+};
+const URL_ID = {
+  MIN: 1,
+  MAX: 25
+};
+const LikesCount = {
+  MIN: 15,
+  MAX: 200
+};
+const CommentsCount = {
+  MIN: 0,
+  MAX: 30
+};
+const CommentsID = {
+  MIN: 1,
+  MAX: Number.MAX_SAFE_INTEGER
+};
+const AvatarID = {
+  MIN: 1,
+  MAX: 6
+};
+const MessagesCount = {
+  MIN: 1,
+  MAX: 2
+};
+
 const NAMES = [
   'Александр',
   'Михаил',
@@ -67,7 +96,7 @@ const createRandomIdFromRangeGenerator = (min, max) => {
 const getRandomArrayElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
 
 const createMessage = () => {
-  const sentenceNumber = getRandomInteger(1, 2);
+  const sentenceNumber = getRandomInteger(MessagesCount.MIN, MessagesCount.MAX);
   const message = [];
   for (let i = 0; i < sentenceNumber; i++){
     message.push(getRandomArrayElement(MESSAGE_SENTENCES));
@@ -76,14 +105,14 @@ const createMessage = () => {
   return message.join(' ');
 };
 
-const generatePhotoId = createRandomIdFromRangeGenerator(1, 25);
-const generateUrlId = createRandomIdFromRangeGenerator(1, 25);
-const generateCommentId = createRandomIdFromRangeGenerator(1, Number.MAX_SAFE_INTEGER);
+const generatePhotoId = createRandomIdFromRangeGenerator(PhotoID.MIN, PhotoID.MAX);
+const generateUrlId = createRandomIdFromRangeGenerator(URL_ID.MIN, URL_ID.MAX);
+const generateCommentId = createRandomIdFromRangeGenerator(CommentsID.MIN, CommentsID.MAX);
 
 const createComment = () => (
   {
     id: generateCommentId(),
-    avatar: `img/avatar-${getRandomInteger(1, 6).toString()}.svg`,
+    avatar: `img/avatar-${getRandomInteger(AvatarID.MIN, AvatarID.MAX).toString()}.svg`,
     message: createMessage(),
     name : getRandomArrayElement(NAMES),
   }
@@ -94,10 +123,10 @@ const createPost = () => (
     id: generatePhotoId(),
     url: `photos/${generateUrlId().toString()}.jpg`,
     description: getRandomArrayElement(DESCRIPTIONS),
-    likes: getRandomInteger(15, 200),
-    comments: Array.from({length: getRandomInteger(0, 30)}, createComment),
+    likes: getRandomInteger(LikesCount.MIN,LikesCount.MAX),
+    comments: Array.from({length: getRandomInteger(CommentsCount.MIN, CommentsCount.MAX)}, createComment),
   }
 );
 
-const setOfPosts = Array.from({length: 25}, createPost);
-
+const setOfPosts = () => Array.from({length: PhotoID.MAX}, createPost);
+setOfPosts();
