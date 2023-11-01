@@ -1,31 +1,19 @@
-const checkLineLength = (input, maxLength) => input.length <= maxLength;
+const MINUTES_IN_HOUR = 60;
 
-const isPalindrom = (input) => {
-  const line = input.replaceAll(' ','').toLowerCase();
-  let reverseLine = '';
-  for (let i = line.length - 1; i >= 0; i--){
-    reverseLine += line[i];
-  }
-  return reverseLine === line;
+const convertTimeToMinutes = (time) =>
+  parseInt(time.split(':')[0], 10) * MINUTES_IN_HOUR + parseInt(time.split(':')[1], 10);
+
+const isMeetingInTime = (timeStartWorkingDay, timeEndWorkingDay, timeStartMeeting, durationMeeting) => {
+  const timeStartWorkingDayInMinutes = convertTimeToMinutes(timeStartWorkingDay);
+  const timeEndWorkingDayInMinutes = convertTimeToMinutes(timeEndWorkingDay);
+  const timeStartMeetingInMinutes = convertTimeToMinutes(timeStartMeeting);
+
+  return timeStartMeetingInMinutes >= timeStartWorkingDayInMinutes &&
+    timeStartMeetingInMinutes + durationMeeting <= timeEndWorkingDayInMinutes;
 };
 
-const extractDigits = (input) => {
-  let result = '';
-  for (let i = 0; i < input.toString().length; i++){
-    if (input[i] >= '0' && input[i] <= '9'){
-      result += input[i];
-    }
-  }
-  return result === '' ? NaN : parseInt(result, 10);
-};
-
-checkLineLength('efg', 4); //true
-checkLineLength('abcdefg', 4); //false
-
-isPalindrom('Лёша на полке клопа нашёл '); //true
-isPalindrom('abcdes'); //false
-
-extractDigits('1 кефир, 0.5 батона'); //105
-extractDigits('а я томат'); //NaN
-
-
+isMeetingInTime('08:00', '17:30', '14:00', 90);  //true
+isMeetingInTime('8:0', '10:0', '8:0', 120);      //true
+isMeetingInTime('08:00', '14:30', '14:00', 90);  //false
+isMeetingInTime('14:00', '17:30', '08:0', 90);   //false
+isMeetingInTime('8:00', '17:30', '08:00', 900);  //false
