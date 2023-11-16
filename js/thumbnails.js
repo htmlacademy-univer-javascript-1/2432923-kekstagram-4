@@ -12,8 +12,6 @@ const getThumbnails = () => {
     thumbnail.querySelector('.picture__img').alt = picture.description;
     thumbnail.querySelector('.picture__likes').textContent = picture.likes;
     thumbnail.querySelector('.picture__comments').textContent = picture.comments;
-    //console.log(picture.querySelector('.picture__img').src);
-    //console.log(ob);
     picturesList.appendChild(thumbnail);
   });
 };
