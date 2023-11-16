@@ -81,7 +81,7 @@ const getComment = (_, id) => (
 
 const getPhotoData = (_, id) => (
   {
-    id,
+    id: id++,
     url: `photos/${id}.jpg`,
     description: getRandomArrayElement(DESCRIPTIONS),
     likes: getRandomInteger(LikesCount.MIN, LikesCount.MAX),
