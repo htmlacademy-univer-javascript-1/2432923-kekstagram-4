@@ -5,7 +5,7 @@ const picturesList = document.querySelector('.pictures');
 const pictures = getPhotos();
 const picturesListFragment = document.createDocumentFragment();
 
-//const getThumbnails = () => {
+const getThumbnails = () => {
   pictures.forEach((picture) => {
     const thumbnail = pictureTemplate.cloneNode(true);
     thumbnail.querySelector('.picture__img').src = picture.url;
@@ -16,7 +16,7 @@ const picturesListFragment = document.createDocumentFragment();
     //console.log(ob);
     picturesList.appendChild(thumbnail);
   });
-//};
+};
 
 picturesList.appendChild(picturesListFragment);
-//export {getThumbnails};
+export {getThumbnails};
