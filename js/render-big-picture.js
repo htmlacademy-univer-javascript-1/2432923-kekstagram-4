@@ -1,7 +1,6 @@
 const bigPicture = document.querySelector('.big-picture');
 const cancelButton = document.querySelector('.big-picture__cancel');
 const commentsCount = document.querySelector('.social__comment-count');
-//const commentElement = document.querySelector('#comment').content.querySelector()
 const commentsList = document.querySelector('.social__comments');
 const commentsLoader = document.querySelector('.comments-loader');
 const bodyElement = document.querySelector('body');
@@ -19,17 +18,10 @@ const getCommentTemplate = (comment) => `
 const renderComments = (picture) => {
   commentsList.innerHTML = '';
   commentsList.insertAdjacentHTML('afterbegin', picture.comments.map((comment) => getCommentTemplate(comment)).join(''));
-  // const fragment = document.createDocumentFragment();
-  // picture.comments.forEach((item) => {
-  //   const comment = getCommentTemplate(item);
-  //   fragment.append(comment);
-  // });
-  // commentsList.append(fragment);
 };
 
 const renderPictureData = ({url, likes, description, comments}) => {
-
-  document.querySelector('.big-picture__img img').src = url;
+  bigPicture.querySelector('.big-picture__img img').src = url;
   bigPicture.querySelector('.likes-count').textContent = likes;
   bigPicture.querySelector('.social__caption').textContent = description;
   bigPicture.querySelector('.comments-count').textContent = comments.length;
@@ -38,13 +30,14 @@ const renderPictureData = ({url, likes, description, comments}) => {
 const hideFullsizePicture = () => {
   bigPicture.classList.add('hidden');
   bodyElement.classList.remove('modal-open');
+
   document.removeEventListener('keydown', onKeyDown);
-  //cancelButton.removeEventListener('click', onCancelButtonClick);
 };
 
 const showFullsizePicture = (picture) => {
   renderPictureData(picture);
   renderComments(picture);
+
   bigPicture.classList.remove('hidden');
   bodyElement.classList.add('modal-open');
   commentsCount.classList.add('hidden');
@@ -65,5 +58,5 @@ function onKeyDown(evt){
 function onCancelButtonClick(){
   hideFullsizePicture();
 }
-//cancelButton.addEventListener('click', onCancelButtonClick);
+
 export { showFullsizePicture };
