@@ -1,9 +1,9 @@
 const bigPicture = document.querySelector('.big-picture');
-const cancelButton = document.querySelector('.big-picture__cancel');
-const commentsCount = document.querySelector('.social__comment-count');
-const commentsList = document.querySelector('.social__comments');
-const commentsLoader = document.querySelector('.comments-loader');
-const bodyElement = document.querySelector('body');
+const cancelButton = bigPicture.querySelector('.big-picture__cancel');
+const commentsCount = bigPicture.querySelector('.social__comment-count');
+const commentsList = bigPicture.querySelector('.social__comments');
+const commentsLoader = bigPicture.querySelector('.comments-loader');
+const body = document.querySelector('body');
 
 const getCommentTemplate = (comment) => `
   <li class="social__comment">
@@ -29,9 +29,9 @@ const renderPictureData = ({url, likes, description, comments}) => {
 
 const hideFullsizePicture = () => {
   bigPicture.classList.add('hidden');
-  bodyElement.classList.remove('modal-open');
+  body.classList.remove('modal-open');
 
-  document.removeEventListener('keydown', onKeyDown);
+  document.removeEventListener('keydown', onDocumentKeyDown);
 };
 
 const showFullsizePicture = (picture) => {
@@ -39,16 +39,15 @@ const showFullsizePicture = (picture) => {
   renderComments(picture);
 
   bigPicture.classList.remove('hidden');
-  bodyElement.classList.add('modal-open');
+  body.classList.add('modal-open');
   commentsCount.classList.add('hidden');
   commentsLoader.classList.add('hidden');
 
-  document.addEventListener('keydown', onKeyDown);
+  document.addEventListener('keydown', onDocumentKeyDown);
   cancelButton.addEventListener('click', onCancelButtonClick);
-
 };
 
-function onKeyDown(evt){
+function onDocumentKeyDown(evt){
   if (evt.key === 'Escape') {
     evt.preventDefault();
     hideFullsizePicture();
