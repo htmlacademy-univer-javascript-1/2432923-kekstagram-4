@@ -36,6 +36,10 @@ const renderComments = () => {
   commentsShownCountElement.textContent = commentsShownCount;
 };
 
+const onLoadButtonClick = () => {
+  renderComments();
+};
+
 const initComments = () => {
   renderComments();
   loadButtonElement.addEventListener('click', onLoadButtonClick);
@@ -82,10 +86,6 @@ function onDocumentKeyDown(evt) {
 
 function onCancelButtonClick() {
   hideFullsizePicture();
-}
-
-function onLoadButtonClick() {
-  renderComments();
 }
 
 export { showFullsizePicture };
