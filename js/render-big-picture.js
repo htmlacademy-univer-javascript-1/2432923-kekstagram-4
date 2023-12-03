@@ -1,9 +1,14 @@
-const bigPicture = document.querySelector('.big-picture');
-const cancelButton = bigPicture.querySelector('.big-picture__cancel');
-const commentsCount = bigPicture.querySelector('.social__comment-count');
-const commentsList = bigPicture.querySelector('.social__comments');
-const commentsLoader = bigPicture.querySelector('.comments-loader');
-const body = document.querySelector('body');
+const COMMENTS_STEP = 5;
+
+const bigPictureElement = document.querySelector('.big-picture');
+const cancelButtonElement = bigPictureElement.querySelector('.big-picture__cancel');
+const commentsShownCountElement = bigPictureElement.querySelector('.comments-shown');
+const commentsListElement = bigPictureElement.querySelector('.social__comments');
+const loadButtonElement = bigPictureElement.querySelector('.social__comments-loader');
+const bodyElement = document.querySelector('body');
+
+let commentsShownCount = 0;
+let comments = [];
 
 const getCommentTemplate = (comment) => `
   <li class="social__comment">
@@ -15,46 +20,71 @@ const getCommentTemplate = (comment) => `
     <p class="social__text">${comment.message}</p>
   </li>`;
 
-const renderComments = (picture) => {
-  commentsList.innerHTML = '';
-  commentsList.insertAdjacentHTML('afterbegin', picture.comments.map((comment) => getCommentTemplate(comment)).join(''));
+const renderComments = () => {
+  commentsShownCount += COMMENTS_STEP;
+
+  if(commentsShownCount >= comments.length) {
+    loadButtonElement.classList.add('hidden');
+    commentsShownCount = comments.length;
+  } else {
+    loadButtonElement.classList.remove('hidden');
+  }
+
+  const commentsSet = comments.slice(0, commentsShownCount);
+  commentsListElement.innerHTML = '';
+  commentsListElement.insertAdjacentHTML('afterbegin', commentsSet.map((comment) => getCommentTemplate(comment)).join(''));
+  commentsShownCountElement.textContent = commentsShownCount;
 };
 
-const renderPictureData = ({url, likes, description, comments}) => {
-  bigPicture.querySelector('.big-picture__img img').src = url;
-  bigPicture.querySelector('.likes-count').textContent = likes;
-  bigPicture.querySelector('.social__caption').textContent = description;
-  bigPicture.querySelector('.comments-count').textContent = comments.length;
+const onLoadButtonClick = () => {
+  renderComments();
+};
+
+const initComments = () => {
+  renderComments();
+  loadButtonElement.addEventListener('click', onLoadButtonClick);
+};
+
+const destroyComments = () => {
+  loadButtonElement.removeEventListener('click', onLoadButtonClick);
+  commentsShownCount = 0;
+};
+
+const renderPictureData = (picture) => {
+  bigPictureElement.querySelector('.big-picture__img img').src = picture.url;
+  bigPictureElement.querySelector('.likes-count').textContent = picture.likes;
+  bigPictureElement.querySelector('.social__caption').textContent = picture.description;
+  bigPictureElement.querySelector('.comments-count').textContent = comments.length;
 };
 
 const hideFullsizePicture = () => {
-  bigPicture.classList.add('hidden');
-  body.classList.remove('modal-open');
+  bigPictureElement.classList.add('hidden');
+  bodyElement.classList.remove('modal-open');
 
   document.removeEventListener('keydown', onDocumentKeyDown);
+  destroyComments();
 };
 
 const showFullsizePicture = (picture) => {
+  comments = picture.comments.slice();
   renderPictureData(picture);
-  renderComments(picture);
+  initComments();
 
-  bigPicture.classList.remove('hidden');
-  body.classList.add('modal-open');
-  commentsCount.classList.add('hidden');
-  commentsLoader.classList.add('hidden');
+  bigPictureElement.classList.remove('hidden');
+  bodyElement.classList.add('modal-open');
 
   document.addEventListener('keydown', onDocumentKeyDown);
-  cancelButton.addEventListener('click', onCancelButtonClick);
+  cancelButtonElement.addEventListener('click', onCancelButtonClick);
 };
 
-function onDocumentKeyDown(evt){
+function onDocumentKeyDown(evt) {
   if (evt.key === 'Escape') {
     evt.preventDefault();
     hideFullsizePicture();
   }
 }
 
-function onCancelButtonClick(){
+function onCancelButtonClick() {
   hideFullsizePicture();
 }
 
