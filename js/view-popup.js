@@ -57,7 +57,7 @@ const renderPictureData = (picture) => {
   bigPictureElement.querySelector('.comments-count').textContent = comments.length;
 };
 
-const hideFullsizePicture = () => {
+const closeViewPopup = () => {
   bigPictureElement.classList.add('hidden');
   bodyElement.classList.remove('modal-open');
 
@@ -65,7 +65,7 @@ const hideFullsizePicture = () => {
   destroyComments();
 };
 
-const showFullsizePicture = (picture) => {
+const openViewPopup = (picture) => {
   comments = picture.comments.slice();
   renderPictureData(picture);
   initComments();
@@ -80,12 +80,12 @@ const showFullsizePicture = (picture) => {
 function onDocumentKeyDown(evt) {
   if (evt.key === 'Escape') {
     evt.preventDefault();
-    hideFullsizePicture();
+    closeViewPopup();
   }
 }
 
 function onCancelButtonClick() {
-  hideFullsizePicture();
+  closeViewPopup();
 }
 
-export { showFullsizePicture };
+export { openViewPopup as showFullsizePicture };
