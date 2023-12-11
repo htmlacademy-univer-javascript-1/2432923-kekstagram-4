@@ -6,6 +6,7 @@ const errorText = {
   INVALID_PATTERN_HASHTAG: 'Неправильный хэштег',
   INVALID_DESCRIPTION: 'Слишком длинный комментарий',
 };
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const bodyElement = document.querySelector('body');
 const overlayElement = bodyElement.querySelector('.img-upload__overlay');
@@ -15,6 +16,22 @@ const formElement = bodyElement.querySelector('.img-upload__form');
 const commentElement = overlayElement.querySelector('.text__description');
 const hashtagsElement = formElement.querySelector('.text__hashtags');
 const descriptionElement = formElement.querySelector('.text__description');
+const preview = document.querySelector('.img-upload__preview img');
+
+let file;
+let fileName = '';
+let matches = [];
+
+const isValidFileType = () => {
+  file = inputUploadElement.files[0];
+  fileName = file.name.toLowerCase();
+  matches = FILE_TYPES.some((type) => fileName.endsWith(type));
+  if (matches) {
+    preview.src = URL.createObjectURL(file);
+    return true;
+  }
+};
+
 
 const pristine = new Pristine(formElement, {
   classTo: 'img-upload__field-wrapper',
@@ -80,8 +97,10 @@ const closeEditPopup = () => {
 };
 
 const onInputUploadElementChange = () => {
-  openEditPopup();
-  initValidation();
+  if (isValidFileType()){
+    openEditPopup();
+    initValidation();
+  }
 };
 
 function onDocumentKeyDown(evt) {
