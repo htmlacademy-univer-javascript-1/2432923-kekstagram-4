@@ -16,7 +16,6 @@ const formElement = bodyElement.querySelector('.img-upload__form');
 const commentElement = overlayElement.querySelector('.text__description');
 const hashtagsElement = formElement.querySelector('.text__hashtags');
 const descriptionElement = formElement.querySelector('.text__description');
-const preview = document.querySelector('.img-upload__preview img');
 
 const isValidFileType = () => {
   const file = inputUploadElement.files[0];
