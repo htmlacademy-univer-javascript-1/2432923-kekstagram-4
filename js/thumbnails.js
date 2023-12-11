@@ -1,4 +1,4 @@
-import { showFullsizePicture } from './render-big-picture.js';
+import { showFullsizePicture } from './view-popup.js';
 
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const picturesContainer = document.querySelector('.pictures');
@@ -26,14 +26,16 @@ const createThumbnail = ({url, description, likes, comments, id}) => {
 
 const renderThumbnails = (data) => {
   pictures = data.slice();
-  const picturesListFragment = document.createDocumentFragment();
-  pictures.forEach((picture) => {
-    const thumbnail = createThumbnail(picture);
-    picturesListFragment.appendChild(thumbnail);
-  });
+  if (pictures){
+    const picturesListFragment = document.createDocumentFragment();
+    pictures.forEach((picture) => {
+      const thumbnail = createThumbnail(picture);
+      picturesListFragment.appendChild(thumbnail);
+    });
 
-  picturesContainer.appendChild(picturesListFragment);
-  picturesContainer.addEventListener('click', onPicturesContainerClick);
+    picturesContainer.appendChild(picturesListFragment);
+    picturesContainer.addEventListener('click', onPicturesContainerClick);
+  }
 };
 
 export {renderThumbnails};
