@@ -18,20 +18,15 @@ const hashtagsElement = formElement.querySelector('.text__hashtags');
 const descriptionElement = formElement.querySelector('.text__description');
 const preview = document.querySelector('.img-upload__preview img');
 
-let file;
-let fileName = '';
-let matches = [];
-
 const isValidFileType = () => {
-  file = inputUploadElement.files[0];
-  fileName = file.name.toLowerCase();
-  matches = FILE_TYPES.some((type) => fileName.endsWith(type));
+  const file = inputUploadElement.files[0];
+  const fileName = file.name.toLowerCase();
+  const matches = FILE_TYPES.some((type) => fileName.endsWith(type));
   if (matches) {
     preview.src = URL.createObjectURL(file);
     return true;
   }
 };
-
 
 const pristine = new Pristine(formElement, {
   classTo: 'img-upload__field-wrapper',
