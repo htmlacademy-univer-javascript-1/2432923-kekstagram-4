@@ -22,7 +22,6 @@ const isValidFileType = () => {
   const file = inputUploadElement.files[0];
   const isValid = FILE_TYPES.some((type) => file.name.endsWith(type));
   if (isValid) {
-    preview.src = URL.createObjectURL(file);
     return true;
   }
 };
