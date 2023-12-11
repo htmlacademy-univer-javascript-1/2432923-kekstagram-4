@@ -20,8 +20,7 @@ const preview = document.querySelector('.img-upload__preview img');
 
 const isValidFileType = () => {
   const file = inputUploadElement.files[0];
-  const fileName = file.name.toLowerCase();
-  const isValid = FILE_TYPES.some((type) => fileName.endsWith(type));
+  const isValid = FILE_TYPES.some((type) => file.name.endsWith(type));
   if (isValid) {
     preview.src = URL.createObjectURL(file);
     return true;
