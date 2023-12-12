@@ -1,35 +1,152 @@
 const VALID_SYMBOLS = /^#[a-zа-ё0-9]{1,19}$/i;
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 const MAX_HASHTAG_COUNT = 5;
-
 const SCALE_STEP = 25;
 const MAX_SCALE = 100;
 const MIN_SCALE = 25;
 const PERCENT_DIVIDER = 100;
-
-const errorText = {
+const Effects = [
+  {
+    name: 'original',
+    style: 'none',
+    min: 0,
+    max: 100,
+    step: 1,
+    measure: '',
+  },
+  {
+    name: 'chrome',
+    style: 'grayscale',
+    min: 0,
+    max: 1,
+    step: 0.1,
+    measure: '',
+  },
+  {
+    name: 'sepia',
+    style: 'sepia',
+    min: 0,
+    max: 1,
+    step: 0.1,
+    measure: '',
+  },
+  {
+    name: 'marvin',
+    style: 'invert',
+    min: 0,
+    max: 100,
+    step: 1,
+    measure: '%',
+  },
+  {
+    name: 'phobos',
+    style: 'blur',
+    min: 0,
+    max: 3,
+    step: 0.1,
+    measure: 'px',
+  },
+  {
+    name: 'heat',
+    style: 'brightness',
+    min: 0,
+    max: 3,
+    step: 0.1,
+    measure: '',
+  },
+];
+const DEFAULT_EFFECT = Effects[0];
+const ErrorText = {
   INVALID_HASHTAGS_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хэштегов`,
   NOT_UNIQUE_HASHTAG: 'Неуникальный хэштег',
   INVALID_PATTERN_HASHTAG: 'Неправильный хэштег',
   INVALID_DESCRIPTION: 'Слишком длинный комментарий',
 };
-const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const bodyElement = document.querySelector('body');
 const overlayElement = bodyElement.querySelector('.img-upload__overlay');
 const cancelButtonElement = overlayElement.querySelector('.img-upload__cancel');
 const inputUploadElement = bodyElement.querySelector('.img-upload__input');
 const formElement = bodyElement.querySelector('.img-upload__form');
-const commentElement = overlayElement.querySelector('.text__description');
-const hashtagsElement = formElement.querySelector('.text__hashtags');
-const descriptionElement = formElement.querySelector('.text__description');
+const hashtagFieldElement = formElement.querySelector('.text__hashtags');
+const descriptionFieldElement = formElement.querySelector('.text__description');
 
 const zoomOutElement = overlayElement.querySelector('.scale__control--smaller');
 const zoomInElement = overlayElement.querySelector('.scale__control--bigger');
 const scaleValueElement = overlayElement.querySelector('.scale__control--value');
-const preview = document.querySelector('.img-upload__preview img');
+const previewElement = document.querySelector('.img-upload__preview img');
+
+const effectsElement = document.querySelector('.effects');
+const sliderElement = document.querySelector('.effect-level__slider');
+const sliderContainerElement = document.querySelector('.img-upload__effect-level');
+const levelEffectElement = document.querySelector('.effect-level__value');
+
+let chosenEffect = DEFAULT_EFFECT;
+
+const isDefault = () => chosenEffect === DEFAULT_EFFECT;
+
+const openSlider = () => sliderContainerElement.classList.remove('hidden');
+
+const closeSlider = () => sliderContainerElement.classList.add('hidden');
+
+const updateSlider = () => {
+  sliderElement.noUiSlider.updateOptions({
+    range: {
+      min: chosenEffect.min,
+      max: chosenEffect.max,
+    },
+    step: chosenEffect.step,
+    start:chosenEffect.max,
+  });
+
+  if(isDefault()) {
+    closeSlider();
+  } else {
+    openSlider();
+  }
+};
+
+const onChangeEffect = (evt) => {
+  if(!evt.target.classList.contains('effects__radio')) {
+    return;
+  }
+  chosenEffect = Effects.find((effect) => effect.name === evt.target.value);
+  previewElement.className = `effects__preview--${chosenEffect.name}`;
+  updateSlider();
+};
+
+const onSliderUpdate = () => {
+  const sliderValue = sliderElement.noUiSlider.get();
+  previewElement.style.filter = isDefault()
+    ? DEFAULT_EFFECT.style
+    : `${chosenEffect.style}(${sliderValue}${chosenEffect.measure})`;
+  levelEffectElement.value = sliderValue;
+};
+
+const resetEffects = () => {
+  chosenEffect = DEFAULT_EFFECT;
+  updateSlider();
+};
+
+const initEffects = () => {
+  noUiSlider.create(sliderElement, {
+    range: {
+      min: DEFAULT_EFFECT.min,
+      max: DEFAULT_EFFECT.max,
+    },
+    start: DEFAULT_EFFECT.max,
+    step: DEFAULT_EFFECT.step,
+    connect: 'lower',
+  });
+  closeSlider();
+
+  effectsElement.addEventListener('change', onChangeEffect);
+  sliderElement.noUiSlider.on('update', onSliderUpdate);
+};
+
 
 const scalePicture = (value) => {
-  preview.style.transform = `scale(${value / PERCENT_DIVIDER})`;
+  previewElement.style.transform = `scale(${value / PERCENT_DIVIDER})`;
   scaleValueElement.value = `${value}%`;
 };
 
@@ -67,8 +184,8 @@ const pristine = new Pristine(formElement, {
 });
 
 const isTextFieldFocused = () =>
-  document.activeElement === hashtagsElement ||
-  document.activeElement === commentElement;
+  document.activeElement === hashtagFieldElement ||
+  document.activeElement === descriptionFieldElement;
 
 const normilizeHashtags = (hashtagString) => hashtagString.trim().split(' ').filter((hashtag) => hashtag.length > 0);
 
@@ -84,13 +201,13 @@ const validateUniqueHashtag = (value) => {
 };
 
 const initHashtagValidation = () => {
-  pristine.addValidator(hashtagsElement, validateUniqueHashtag, errorText.NOT_UNIQUE_HASHTAG);
-  pristine.addValidator(hashtagsElement, validateHashtagCount, errorText.INVALID_HASHTAGS_COUNT);
-  pristine.addValidator(hashtagsElement, validateHashtagSymbols, errorText.INVALID_PATTERN_HASHTAG);
+  pristine.addValidator(hashtagFieldElement, validateUniqueHashtag, ErrorText.NOT_UNIQUE_HASHTAG);
+  pristine.addValidator(hashtagFieldElement, validateHashtagCount, ErrorText.INVALID_HASHTAGS_COUNT);
+  pristine.addValidator(hashtagFieldElement, validateHashtagSymbols, ErrorText.INVALID_PATTERN_HASHTAG);
 };
 
 const initDescriptionValidation = () => {
-  pristine.addValidator(descriptionElement, validateDescription, errorText.INVALID_DESCRIPTION);
+  pristine.addValidator(descriptionFieldElement, validateDescription, ErrorText.INVALID_DESCRIPTION);
 };
 
 const initValidation = () => {
@@ -122,7 +239,7 @@ const closeEditPopup = () => {
 
   formElement.reset();
   pristine.reset();
-  resetScale();
+  resetEffects();
 };
 
 const onInputUploadElementChange = () => {
@@ -130,6 +247,7 @@ const onInputUploadElementChange = () => {
     openEditPopup();
     initValidation();
     initScale();
+    initEffects();
   }
 };
 
