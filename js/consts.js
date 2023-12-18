@@ -10,7 +10,7 @@ export const MIN_SCALE = 25;
 export const PERCENT_DIVIDER = 100;
 export const SubmitButtonText = {
   DEFAULT: 'Опубликовать',
-  SENDING: 'Сохраняю...'
+  SENDING: 'Публикую...'
 };
 export const Effect = {
   default: {
