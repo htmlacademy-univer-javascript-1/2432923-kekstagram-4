@@ -1,4 +1,4 @@
-const COMMENTS_STEP = 5;
+import { COMMENTS_STEP } from './consts.js';
 
 const bigPictureElement = document.querySelector('.big-picture');
 const cancelButtonElement = bigPictureElement.querySelector('.big-picture__cancel');
