@@ -1,67 +1,10 @@
-const VALID_SYMBOLS = /^#[a-zа-ё0-9]{1,19}$/i;
-const FILE_TYPES = ['jpg', 'jpeg', 'png'];
-const MAX_HASHTAG_COUNT = 5;
-const SCALE_STEP = 25;
-const MAX_SCALE = 100;
-const MIN_SCALE = 25;
-const PERCENT_DIVIDER = 100;
-const Effects = [
-  {
-    name: 'original',
-    style: 'none',
-    min: 0,
-    max: 100,
-    step: 1,
-    measure: '',
-  },
-  {
-    name: 'chrome',
-    style: 'grayscale',
-    min: 0,
-    max: 1,
-    step: 0.1,
-    measure: '',
-  },
-  {
-    name: 'sepia',
-    style: 'sepia',
-    min: 0,
-    max: 1,
-    step: 0.1,
-    measure: '',
-  },
-  {
-    name: 'marvin',
-    style: 'invert',
-    min: 0,
-    max: 100,
-    step: 1,
-    measure: '%',
-  },
-  {
-    name: 'phobos',
-    style: 'blur',
-    min: 0,
-    max: 3,
-    step: 0.1,
-    measure: 'px',
-  },
-  {
-    name: 'heat',
-    style: 'brightness',
-    min: 0,
-    max: 3,
-    step: 0.1,
-    measure: '',
-  },
-];
-const DEFAULT_EFFECT = Effects[0];
-const ErrorText = {
-  INVALID_HASHTAGS_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хэштегов`,
-  NOT_UNIQUE_HASHTAG: 'Неуникальный хэштег',
-  INVALID_PATTERN_HASHTAG: 'Неправильный хэштег',
-  INVALID_DESCRIPTION: 'Слишком длинный комментарий',
-};
+import { sendData } from './api.js';
+import { showErrorMessage, showSuccessMessage } from './response.js';
+import { Effect, PERCENT_DIVIDER, MIN_SCALE, MAX_SCALE, MAX_HASHTAG_COUNT, SCALE_STEP,
+  FILE_TYPES, VALID_SYMBOLS, ErrorText, SubmitButtonText } from './consts.js';
+import { isEscapeKey } from './utils.js';
+
+const DEFAULT_EFFECT = Effect.default;
 
 const bodyElement = document.querySelector('body');
 const overlayElement = bodyElement.querySelector('.img-upload__overlay');
@@ -80,6 +23,7 @@ const effectsElement = document.querySelector('.effects');
 const sliderElement = document.querySelector('.effect-level__slider');
 const sliderContainerElement = document.querySelector('.img-upload__effect-level');
 const levelEffectElement = document.querySelector('.effect-level__value');
+const submitButtonElement = formElement.querySelector('.img-upload__submit');
 
 let chosenEffect = DEFAULT_EFFECT;
 
@@ -107,10 +51,7 @@ const updateSlider = () => {
 };
 
 const onChangeEffect = (evt) => {
-  if(!evt.target.classList.contains('effects__radio')) {
-    return;
-  }
-  chosenEffect = Effects.find((effect) => effect.name === evt.target.value);
+  chosenEffect = Effect[evt.target.value] ? Effect[evt.target.value] : Effect.default;
   previewElement.className = `effects__preview--${chosenEffect.name}`;
   updateSlider();
 };
@@ -128,7 +69,7 @@ const resetEffects = () => {
   updateSlider();
 };
 
-const initEffects = () => {
+const createSlider = () => {
   noUiSlider.create(sliderElement, {
     range: {
       min: DEFAULT_EFFECT.min,
@@ -138,12 +79,15 @@ const initEffects = () => {
     step: DEFAULT_EFFECT.step,
     connect: 'lower',
   });
+};
+
+const initEffects = () => {
+  createSlider();
   closeSlider();
 
   effectsElement.addEventListener('change', onChangeEffect);
   sliderElement.noUiSlider.on('update', onSliderUpdate);
 };
-
 
 const scalePicture = (value) => {
   previewElement.style.transform = `scale(${value / PERCENT_DIVIDER})`;
@@ -200,24 +144,11 @@ const validateUniqueHashtag = (value) => {
   return lowerCaseHashtags.length === new Set(lowerCaseHashtags).size;
 };
 
-const initHashtagValidation = () => {
+const initValidation = () => {
   pristine.addValidator(hashtagFieldElement, validateUniqueHashtag, ErrorText.NOT_UNIQUE_HASHTAG);
   pristine.addValidator(hashtagFieldElement, validateHashtagCount, ErrorText.INVALID_HASHTAGS_COUNT);
   pristine.addValidator(hashtagFieldElement, validateHashtagSymbols, ErrorText.INVALID_PATTERN_HASHTAG);
-};
-
-const initDescriptionValidation = () => {
   pristine.addValidator(descriptionFieldElement, validateDescription, ErrorText.INVALID_DESCRIPTION);
-};
-
-const initValidation = () => {
-  initHashtagValidation();
-  initDescriptionValidation();
-};
-
-const onFormElementSubmit = (evt) => {
-  evt.preventDefault();
-  pristine.validate();
 };
 
 const openEditPopup = () => {
@@ -242,17 +173,39 @@ const closeEditPopup = () => {
   resetEffects();
 };
 
+const toggleSubmitButton = (isDisabled = false) => {
+  submitButtonElement.disabled = isDisabled;
+  submitButtonElement.textContent = isDisabled ? SubmitButtonText.SENDING : SubmitButtonText.DEFAULT;
+};
+
+function onFormElementSubmit(evt) {
+  evt.preventDefault();
+  if (pristine.validate()) {
+    toggleSubmitButton(true);
+    sendData(new FormData(evt.target))
+      .then(() => {
+        closeEditPopup();
+        showSuccessMessage();
+      })
+      .catch(showErrorMessage)
+      .finally(toggleSubmitButton);
+  }
+}
+
 const onInputUploadElementChange = () => {
   if (isValidFileType()){
     openEditPopup();
     initValidation();
     initScale();
     initEffects();
+  } else {
+    showErrorMessage();
+    formElement.reset();
   }
 };
 
 function onDocumentKeyDown(evt) {
-  if (evt.key === 'Escape' && !isTextFieldFocused()) {
+  if (isEscapeKey && !isTextFieldFocused()) {
     evt.preventDefault();
     closeEditPopup();
   }
