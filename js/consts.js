@@ -3,7 +3,7 @@ export const MAX_COUNT_RANDOM_PICTURE = 10;
 export const PHOTOS_COUNT = 25;
 export const ALERT_SHOW_TIME = 5000;
 export const VALID_SYMBOLS = /^#[a-zа-ё0-9]{1,19}$/i;
-export const FILE_TYPES = ['jpg', 'jpeg', 'png'];
+export const FILE_TYPES = ['jpg', 'jpeg', 'png', 'PNG'];
 export const MAX_HASHTAG_COUNT = 5;
 export const SCALE_STEP = 25;
 export const MAX_SCALE = 100;
@@ -17,7 +17,7 @@ export const SubmitButtonText = {
   SENDING: 'Публикую...'
 };
 export const Effect = {
-  DEFAULT: {
+  NONE: {
     style: 'none',
     min: 0,
     max: 100,

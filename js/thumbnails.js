@@ -1,7 +1,7 @@
 import { showFullsizePicture } from './view-popup.js';
 
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
-const picturesContainer = document.querySelector('.pictures');
+const picturesContainerElement = document.querySelector('.pictures');
 
 let pictures = null;
 
@@ -42,7 +42,7 @@ export const initThumbnails = (data) => {
       picturesListFragment.appendChild(thumbnail);
     });
 
-    picturesContainer.appendChild(picturesListFragment);
-    picturesContainer.addEventListener('click', onPicturesContainerClick);
+    picturesContainerElement.appendChild(picturesListFragment);
+    picturesContainerElement.addEventListener('click', onPicturesContainerClick);
   }
 };

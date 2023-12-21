@@ -22,36 +22,40 @@ const sliderContainerElement = document.querySelector('.img-upload__effect-level
 const levelEffectElement = document.querySelector('.effect-level__value');
 const submitButtonElement = formElement.querySelector('.img-upload__submit');
 
-const DEFAULT_EFFECT = Effect.DEFAULT;
+const DEFAULT_EFFECT = Effect['NONE'];
 
 let chosenEffect = DEFAULT_EFFECT;
 
 const isDefault = () => chosenEffect === DEFAULT_EFFECT;
-
 const openSlider = () => sliderContainerElement.classList.remove('hidden');
-
 const closeSlider = () => sliderContainerElement.classList.add('hidden');
 
-const updateSlider = () => {
-  sliderElement.noUiSlider.updateOptions({
-    range: {
-      min: chosenEffect.min,
-      max: chosenEffect.max,
-    },
-    step: chosenEffect.step,
-    start:chosenEffect.max,
-  });
+const removeSlider = () => {
+  chosenEffect = DEFAULT_EFFECT;
+  closeSlider();
+  sliderElement.noUiSlider.destroy();
+};
 
+const updateSlider = () => {
   if(isDefault()) {
     closeSlider();
   } else {
+    sliderElement.noUiSlider.updateOptions({
+      range: {
+        min: chosenEffect.min,
+        max: chosenEffect.max,
+      },
+      step: chosenEffect.step,
+      start: chosenEffect.max,
+    });
+
     openSlider();
   }
 };
 
 const onChangeEffect = (evt) => {
-  chosenEffect = Effect[evt.target.value] ? Effect[evt.target.value] : Effect.DEFAULT;
-  previewElement.className = `effects__preview--${chosenEffect.name}`;
+  const name =  evt.target.value.toUpperCase();
+  chosenEffect = Effect[name] ? Effect[name] : DEFAULT_EFFECT;
   updateSlider();
 };
 
@@ -63,12 +67,13 @@ const onSliderUpdate = () => {
   levelEffectElement.value = sliderValue;
 };
 
-const resetEffects = () => {
-  chosenEffect = DEFAULT_EFFECT;
-  updateSlider();
+const resetEffectsSlider = () => {
+  removeSlider();
+  effectsElement.removeEventListener('change', onChangeEffect);
 };
 
 const createSlider = () => {
+  closeSlider();
   noUiSlider.create(sliderElement, {
     range: {
       min: DEFAULT_EFFECT.min,
@@ -78,14 +83,12 @@ const createSlider = () => {
     step: DEFAULT_EFFECT.step,
     connect: 'lower',
   });
+  sliderElement.noUiSlider.on('update', onSliderUpdate);
 };
 
-const initEffects = () => {
+const initEffectsSlider = () => {
   createSlider();
-  closeSlider();
-
   effectsElement.addEventListener('change', onChangeEffect);
-  sliderElement.noUiSlider.on('update', onSliderUpdate);
 };
 
 const scalePicture = (value) => {
@@ -169,7 +172,7 @@ const closeEditPopup = () => {
 
   formElement.reset();
   pristine.reset();
-  resetEffects();
+  resetEffectsSlider();
 };
 
 const toggleSubmitButton = (isDisabled = false) => {
@@ -196,7 +199,7 @@ const onInputUploadElementChange = () => {
     openEditPopup();
     initValidation();
     initScale();
-    initEffects();
+    initEffectsSlider();
   } else {
     showErrorMessage();
     formElement.reset();

@@ -5,8 +5,8 @@ import { MAX_COUNT_RANDOM_PICTURE, Filter } from './consts.js';
 const HIDDEN_CONTAINER_CLASS = 'img-filters--inactive';
 const ACTIVE_FILTER_CLASS = 'img-filters__button--active';
 
-const filtersContainer = document.querySelector('.img-filters');
-const filtersForm = filtersContainer.querySelector('.img-filters__form');
+const filtersContainerElement = document.querySelector('.img-filters');
+const filtersFormElement = filtersContainerElement.querySelector('.img-filters__form');
 
 let pictures = null;
 let activeFilter = Filter.DEFAULT;
@@ -29,7 +29,7 @@ const getFilteredPictures = () => filterFunction[activeFilter]();
 const onFiltersFormClick = (evt) => {
   const id = evt.target.id;
   if (id && id !== activeFilter) {
-    filtersForm.querySelector(`#${activeFilter}`).classList.remove(ACTIVE_FILTER_CLASS);
+    filtersFormElement.querySelector(`#${activeFilter}`).classList.remove(ACTIVE_FILTER_CLASS);
     evt.target.classList.add(ACTIVE_FILTER_CLASS);
     activeFilter = id;
 
@@ -41,8 +41,8 @@ const onFiltersFormClick = (evt) => {
 export const initFilters = (data, cb) => {
   pictures = data.slice();
   callback = cb;
-  filtersContainer.classList.remove(HIDDEN_CONTAINER_CLASS);
-  filtersForm.addEventListener('click', onFiltersFormClick);
+  filtersContainerElement.classList.remove(HIDDEN_CONTAINER_CLASS);
+  filtersFormElement.addEventListener('click', onFiltersFormClick);
 
   initThumbnails(pictures);
 };
