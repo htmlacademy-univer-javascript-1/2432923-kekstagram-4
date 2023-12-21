@@ -26,6 +26,10 @@ const DEFAULT_EFFECT = Effect['NONE'];
 
 let chosenEffect = DEFAULT_EFFECT;
 
+const loadPicture = () => {
+  previewElement.src = URL.createObjectURL(inputUploadElement.files[0]);
+};
+
 const isDefault = () => chosenEffect === DEFAULT_EFFECT;
 const openSlider = () => sliderContainerElement.classList.remove('hidden');
 const closeSlider = () => sliderContainerElement.classList.add('hidden');
@@ -37,25 +41,25 @@ const removeSlider = () => {
 };
 
 const updateSlider = () => {
+  sliderElement.noUiSlider.updateOptions({
+    range: {
+      min: chosenEffect.min,
+      max: chosenEffect.max,
+    },
+    step: chosenEffect.step,
+    start: chosenEffect.max,
+  });
   if(isDefault()) {
     closeSlider();
   } else {
-    sliderElement.noUiSlider.updateOptions({
-      range: {
-        min: chosenEffect.min,
-        max: chosenEffect.max,
-      },
-      step: chosenEffect.step,
-      start: chosenEffect.max,
-    });
-
     openSlider();
   }
 };
 
 const onChangeEffect = (evt) => {
   const name =  evt.target.value.toUpperCase();
-  chosenEffect = Effect[name] ? Effect[name] : DEFAULT_EFFECT;
+  chosenEffect = Effect[name];// ? Effect[name] : DEFAULT_EFFECT;
+  //previewElement.className = `effects__preview--${chosenEffect.name}`;
   updateSlider();
 };
 
@@ -89,6 +93,7 @@ const createSlider = () => {
 const initEffectsSlider = () => {
   createSlider();
   effectsElement.addEventListener('change', onChangeEffect);
+  sliderElement.noUiSlider.on('update', onSliderUpdate);
 };
 
 const scalePicture = (value) => {
@@ -114,6 +119,11 @@ const initScale = () => {
   scalePicture(MAX_SCALE);
   zoomOutElement.addEventListener('click', onZoomOutButtonClick);
   zoomInElement.addEventListener('click', onZoomInButtonClick);
+};
+
+const destroyScale = () => {
+  zoomInElement.removeEventListener('click', onZoomInButtonClick);
+  zoomOutElement.removeEventListener('click', onZoomOutButtonClick);
 };
 
 const isValidFileType = () => {
@@ -146,12 +156,10 @@ const validateUniqueHashtag = (value) => {
   return lowerCaseHashtags.length === new Set(lowerCaseHashtags).size;
 };
 
-const initValidation = () => {
-  pristine.addValidator(hashtagFieldElement, validateUniqueHashtag, ValidationErrorText.NOT_UNIQUE_HASHTAG);
-  pristine.addValidator(hashtagFieldElement, validateHashtagCount, ValidationErrorText.INVALID_HASHTAGS_COUNT);
-  pristine.addValidator(hashtagFieldElement, validateHashtagSymbols, ValidationErrorText.INVALID_PATTERN_HASHTAG);
-  pristine.addValidator(descriptionFieldElement, validateDescription, ValidationErrorText.INVALID_DESCRIPTION);
-};
+pristine.addValidator(hashtagFieldElement, validateUniqueHashtag, ValidationErrorText.NOT_UNIQUE_HASHTAG);
+pristine.addValidator(hashtagFieldElement, validateHashtagCount, ValidationErrorText.INVALID_HASHTAGS_COUNT);
+pristine.addValidator(hashtagFieldElement, validateHashtagSymbols, ValidationErrorText.INVALID_PATTERN_HASHTAG);
+pristine.addValidator(descriptionFieldElement, validateDescription, ValidationErrorText.INVALID_DESCRIPTION);
 
 const openEditPopup = () => {
   bodyElement.classList.add('modal-open');
@@ -163,16 +171,17 @@ const openEditPopup = () => {
 };
 
 const closeEditPopup = () => {
+  formElement.reset();
+  pristine.reset();
+  resetEffectsSlider();
+  destroyScale();
+
   bodyElement.classList.remove('modal-open');
   overlayElement.classList.add('hidden');
 
   document.removeEventListener('keydown', onDocumentKeyDown);
   cancelButtonElement.removeEventListener('click', onCancelButtonClick);
   formElement.removeEventListener('submit', onFormElementSubmit);
-
-  formElement.reset();
-  pristine.reset();
-  resetEffectsSlider();
 };
 
 const toggleSubmitButton = (isDisabled = false) => {
@@ -197,7 +206,8 @@ function onFormElementSubmit(evt) {
 const onInputUploadElementChange = () => {
   if (isValidFileType()){
     openEditPopup();
-    initValidation();
+    loadPicture();
+    //initValidation();
     initScale();
     initEffectsSlider();
   } else {
