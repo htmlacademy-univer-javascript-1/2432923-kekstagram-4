@@ -1,12 +1,9 @@
 import { sendData } from './api.js';
 import { showErrorMessage, showSuccessMessage } from './response.js';
 import { Effect, PERCENT_DIVIDER, MIN_SCALE, MAX_SCALE, MAX_HASHTAG_COUNT, SCALE_STEP,
-  FILE_TYPES, VALID_SYMBOLS, ErrorText, SubmitButtonText } from './consts.js';
+  FILE_TYPES, VALID_SYMBOLS, ValidationErrorText, SubmitButtonText, bodyElement } from './consts.js';
 import { isEscapeKey } from './utils.js';
 
-const DEFAULT_EFFECT = Effect.default;
-
-const bodyElement = document.querySelector('body');
 const overlayElement = bodyElement.querySelector('.img-upload__overlay');
 const cancelButtonElement = overlayElement.querySelector('.img-upload__cancel');
 const inputUploadElement = bodyElement.querySelector('.img-upload__input');
@@ -24,6 +21,8 @@ const sliderElement = document.querySelector('.effect-level__slider');
 const sliderContainerElement = document.querySelector('.img-upload__effect-level');
 const levelEffectElement = document.querySelector('.effect-level__value');
 const submitButtonElement = formElement.querySelector('.img-upload__submit');
+
+const DEFAULT_EFFECT = Effect.DEFAULT;
 
 let chosenEffect = DEFAULT_EFFECT;
 
@@ -51,7 +50,7 @@ const updateSlider = () => {
 };
 
 const onChangeEffect = (evt) => {
-  chosenEffect = Effect[evt.target.value] ? Effect[evt.target.value] : Effect.default;
+  chosenEffect = Effect[evt.target.value] ? Effect[evt.target.value] : Effect.DEFAULT;
   previewElement.className = `effects__preview--${chosenEffect.name}`;
   updateSlider();
 };
@@ -145,10 +144,10 @@ const validateUniqueHashtag = (value) => {
 };
 
 const initValidation = () => {
-  pristine.addValidator(hashtagFieldElement, validateUniqueHashtag, ErrorText.NOT_UNIQUE_HASHTAG);
-  pristine.addValidator(hashtagFieldElement, validateHashtagCount, ErrorText.INVALID_HASHTAGS_COUNT);
-  pristine.addValidator(hashtagFieldElement, validateHashtagSymbols, ErrorText.INVALID_PATTERN_HASHTAG);
-  pristine.addValidator(descriptionFieldElement, validateDescription, ErrorText.INVALID_DESCRIPTION);
+  pristine.addValidator(hashtagFieldElement, validateUniqueHashtag, ValidationErrorText.NOT_UNIQUE_HASHTAG);
+  pristine.addValidator(hashtagFieldElement, validateHashtagCount, ValidationErrorText.INVALID_HASHTAGS_COUNT);
+  pristine.addValidator(hashtagFieldElement, validateHashtagSymbols, ValidationErrorText.INVALID_PATTERN_HASHTAG);
+  pristine.addValidator(descriptionFieldElement, validateDescription, ValidationErrorText.INVALID_DESCRIPTION);
 };
 
 const openEditPopup = () => {

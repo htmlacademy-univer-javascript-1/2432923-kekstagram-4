@@ -2,6 +2,7 @@ import { showFullsizePicture } from './view-popup.js';
 
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const picturesContainer = document.querySelector('.pictures');
+
 let pictures = null;
 
 const onPicturesContainerClick = (evt) => {
@@ -24,7 +25,15 @@ const createThumbnail = ({url, description, likes, comments, id}) => {
   return thumbnail;
 };
 
-const renderThumbnails = (data) => {
+export const destroyThumbnails = () => {
+  document
+    .querySelectorAll('.picture')
+    .forEach((element) => element.remove());
+};
+
+export const initThumbnails = (data) => {
+  destroyThumbnails();
+
   pictures = data.slice();
   if (pictures){
     const picturesListFragment = document.createDocumentFragment();
@@ -37,5 +46,3 @@ const renderThumbnails = (data) => {
     picturesContainer.addEventListener('click', onPicturesContainerClick);
   }
 };
-
-export {renderThumbnails};

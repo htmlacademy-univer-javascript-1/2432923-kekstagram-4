@@ -1,5 +1,5 @@
-import { ALERT_SHOW_TIME } from './consts.js';
-
+// import { ALERT_SHOW_TIME } from './consts.js';
+export const ALERT_SHOW_TIME = 5000;
 export const getRandomInteger = (a, b) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -34,3 +34,26 @@ export const showAlert = (message) => {
 export const isEscapeKey = (evt) => evt.key === 'Escape';
 
 export const getRandomArrayElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
+
+export const debounce = (callback, timeoutDelay = 500) => {
+  let timeoutId;
+
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+};
+
+export const throttle = (callback, delayBetweenFrames) => {
+  let lastTime = 0;
+
+  return (...rest) => {
+    const now = new Date();
+    if (now - lastTime >= delayBetweenFrames) {
+      callback.apply(this, rest);
+      lastTime = now;
+    }
+  };
+};
+
+export const shuffle = (data) => data.sort(() => Math.random() - 0.5);
