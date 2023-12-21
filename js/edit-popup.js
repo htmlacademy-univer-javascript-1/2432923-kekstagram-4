@@ -1,12 +1,9 @@
 import { sendData } from './api.js';
 import { showErrorMessage, showSuccessMessage } from './response.js';
 import { Effect, PERCENT_DIVIDER, MIN_SCALE, MAX_SCALE, MAX_HASHTAG_COUNT, SCALE_STEP,
-  FILE_TYPES, VALID_SYMBOLS, ErrorText, SubmitButtonText } from './consts.js';
+  FILE_TYPES, VALID_SYMBOLS, ValidationErrorText, SubmitButtonText, bodyElement } from './consts.js';
 import { isEscapeKey } from './utils.js';
 
-const DEFAULT_EFFECT = Effect.default;
-
-const bodyElement = document.querySelector('body');
 const overlayElement = bodyElement.querySelector('.img-upload__overlay');
 const cancelButtonElement = overlayElement.querySelector('.img-upload__cancel');
 const inputUploadElement = bodyElement.querySelector('.img-upload__input');
@@ -25,34 +22,40 @@ const sliderContainerElement = document.querySelector('.img-upload__effect-level
 const levelEffectElement = document.querySelector('.effect-level__value');
 const submitButtonElement = formElement.querySelector('.img-upload__submit');
 
+const DEFAULT_EFFECT = Effect['NONE'];
+
 let chosenEffect = DEFAULT_EFFECT;
 
 const isDefault = () => chosenEffect === DEFAULT_EFFECT;
-
 const openSlider = () => sliderContainerElement.classList.remove('hidden');
-
 const closeSlider = () => sliderContainerElement.classList.add('hidden');
 
-const updateSlider = () => {
-  sliderElement.noUiSlider.updateOptions({
-    range: {
-      min: chosenEffect.min,
-      max: chosenEffect.max,
-    },
-    step: chosenEffect.step,
-    start:chosenEffect.max,
-  });
+const removeSlider = () => {
+  chosenEffect = DEFAULT_EFFECT;
+  closeSlider();
+  sliderElement.noUiSlider.destroy();
+};
 
+const updateSlider = () => {
   if(isDefault()) {
     closeSlider();
   } else {
+    sliderElement.noUiSlider.updateOptions({
+      range: {
+        min: chosenEffect.min,
+        max: chosenEffect.max,
+      },
+      step: chosenEffect.step,
+      start: chosenEffect.max,
+    });
+
     openSlider();
   }
 };
 
 const onChangeEffect = (evt) => {
-  chosenEffect = Effect[evt.target.value] ? Effect[evt.target.value] : Effect.default;
-  previewElement.className = `effects__preview--${chosenEffect.name}`;
+  const name =  evt.target.value.toUpperCase();
+  chosenEffect = Effect[name] ? Effect[name] : DEFAULT_EFFECT;
   updateSlider();
 };
 
@@ -64,12 +67,13 @@ const onSliderUpdate = () => {
   levelEffectElement.value = sliderValue;
 };
 
-const resetEffects = () => {
-  chosenEffect = DEFAULT_EFFECT;
-  updateSlider();
+const resetEffectsSlider = () => {
+  removeSlider();
+  effectsElement.removeEventListener('change', onChangeEffect);
 };
 
 const createSlider = () => {
+  closeSlider();
   noUiSlider.create(sliderElement, {
     range: {
       min: DEFAULT_EFFECT.min,
@@ -79,14 +83,12 @@ const createSlider = () => {
     step: DEFAULT_EFFECT.step,
     connect: 'lower',
   });
+  sliderElement.noUiSlider.on('update', onSliderUpdate);
 };
 
-const initEffects = () => {
+const initEffectsSlider = () => {
   createSlider();
-  closeSlider();
-
   effectsElement.addEventListener('change', onChangeEffect);
-  sliderElement.noUiSlider.on('update', onSliderUpdate);
 };
 
 const scalePicture = (value) => {
@@ -145,10 +147,10 @@ const validateUniqueHashtag = (value) => {
 };
 
 const initValidation = () => {
-  pristine.addValidator(hashtagFieldElement, validateUniqueHashtag, ErrorText.NOT_UNIQUE_HASHTAG);
-  pristine.addValidator(hashtagFieldElement, validateHashtagCount, ErrorText.INVALID_HASHTAGS_COUNT);
-  pristine.addValidator(hashtagFieldElement, validateHashtagSymbols, ErrorText.INVALID_PATTERN_HASHTAG);
-  pristine.addValidator(descriptionFieldElement, validateDescription, ErrorText.INVALID_DESCRIPTION);
+  pristine.addValidator(hashtagFieldElement, validateUniqueHashtag, ValidationErrorText.NOT_UNIQUE_HASHTAG);
+  pristine.addValidator(hashtagFieldElement, validateHashtagCount, ValidationErrorText.INVALID_HASHTAGS_COUNT);
+  pristine.addValidator(hashtagFieldElement, validateHashtagSymbols, ValidationErrorText.INVALID_PATTERN_HASHTAG);
+  pristine.addValidator(descriptionFieldElement, validateDescription, ValidationErrorText.INVALID_DESCRIPTION);
 };
 
 const openEditPopup = () => {
@@ -170,7 +172,7 @@ const closeEditPopup = () => {
 
   formElement.reset();
   pristine.reset();
-  resetEffects();
+  resetEffectsSlider();
 };
 
 const toggleSubmitButton = (isDisabled = false) => {
@@ -197,7 +199,7 @@ const onInputUploadElementChange = () => {
     openEditPopup();
     initValidation();
     initScale();
-    initEffects();
+    initEffectsSlider();
   } else {
     showErrorMessage();
     formElement.reset();

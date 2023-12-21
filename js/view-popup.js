@@ -1,11 +1,10 @@
-import { COMMENTS_STEP } from './consts.js';
+import { COMMENTS_STEP, bodyElement } from './consts.js';
 
 const bigPictureElement = document.querySelector('.big-picture');
 const cancelButtonElement = bigPictureElement.querySelector('.big-picture__cancel');
 const commentsShownCountElement = bigPictureElement.querySelector('.comments-shown');
 const commentsListElement = bigPictureElement.querySelector('.social__comments');
 const loadButtonElement = bigPictureElement.querySelector('.social__comments-loader');
-const bodyElement = document.querySelector('body');
 
 let commentsShownCount = 0;
 let comments = [];

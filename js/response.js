@@ -1,11 +1,11 @@
 import { isEscapeKey } from './utils.js';
+import { bodyElement } from './consts.js';
 
 const SUCCESS_SELECTOR = '.success';
 const ERROR_SELECTOR = '.error';
 const SUCCESS_BUTTON_SELECTOR = '.success__button';
 const ERROR_BUTTON_SELECTOR = '.error__button';
 
-const bodyElement = document.querySelector('body');
 const successAlertTemplate = bodyElement.querySelector('#success').content.querySelector(SUCCESS_SELECTOR);
 const successAlertElement = successAlertTemplate.cloneNode(true);
 const errorAlertTemplate = bodyElement.querySelector('#error').content.querySelector(ERROR_SELECTOR);
