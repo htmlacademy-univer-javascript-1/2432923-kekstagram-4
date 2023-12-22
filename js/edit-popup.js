@@ -1,15 +1,12 @@
 import { sendData } from './api.js';
 import { showErrorMessage, showSuccessMessage } from './response.js';
-import { Effect, PERCENT_DIVIDER, MIN_SCALE, MAX_SCALE, MAX_HASHTAG_COUNT, SCALE_STEP,
-  FILE_TYPES, VALID_SYMBOLS, ValidationErrorText, SubmitButtonText, bodyElement } from './consts.js';
+import { Effect, PERCENT_DIVIDER, MIN_SCALE, MAX_SCALE, SCALE_STEP,
+  SubmitButtonText, bodyElement, inputUploadElement, formElement } from './consts.js';
 import { isEscapeKey } from './utils.js';
+import { pristine, isValidFileType, isTextFieldFocused } from './validator.js';
 
 const overlayElement = bodyElement.querySelector('.img-upload__overlay');
 const cancelButtonElement = overlayElement.querySelector('.img-upload__cancel');
-const inputUploadElement = bodyElement.querySelector('.img-upload__input');
-const formElement = bodyElement.querySelector('.img-upload__form');
-const hashtagFieldElement = formElement.querySelector('.text__hashtags');
-const descriptionFieldElement = formElement.querySelector('.text__description');
 
 const zoomOutElement = overlayElement.querySelector('.scale__control--smaller');
 const zoomInElement = overlayElement.querySelector('.scale__control--bigger');
@@ -19,15 +16,21 @@ const previewElement = document.querySelector('.img-upload__preview img');
 const effectsElement = document.querySelector('.effects');
 const sliderElement = document.querySelector('.effect-level__slider');
 const sliderContainerElement = document.querySelector('.img-upload__effect-level');
-const levelEffectElement = document.querySelector('.effect-level__value');
+const effectLevelElement = document.querySelector('.effect-level__value');
 const submitButtonElement = formElement.querySelector('.img-upload__submit');
 
 const DEFAULT_EFFECT = Effect['NONE'];
 
 let chosenEffect = DEFAULT_EFFECT;
 
+const loadPicture = () => {
+  previewElement.src = URL.createObjectURL(inputUploadElement.files[0]);
+};
+
 const isDefault = () => chosenEffect === DEFAULT_EFFECT;
+
 const openSlider = () => sliderContainerElement.classList.remove('hidden');
+
 const closeSlider = () => sliderContainerElement.classList.add('hidden');
 
 const removeSlider = () => {
@@ -37,26 +40,19 @@ const removeSlider = () => {
 };
 
 const updateSlider = () => {
+  sliderElement.noUiSlider.updateOptions({
+    range: {
+      min: chosenEffect.min,
+      max: chosenEffect.max,
+    },
+    step: chosenEffect.step,
+    start: chosenEffect.max,
+  });
   if(isDefault()) {
     closeSlider();
   } else {
-    sliderElement.noUiSlider.updateOptions({
-      range: {
-        min: chosenEffect.min,
-        max: chosenEffect.max,
-      },
-      step: chosenEffect.step,
-      start: chosenEffect.max,
-    });
-
     openSlider();
   }
-};
-
-const onChangeEffect = (evt) => {
-  const name =  evt.target.value.toUpperCase();
-  chosenEffect = Effect[name] ? Effect[name] : DEFAULT_EFFECT;
-  updateSlider();
 };
 
 const onSliderUpdate = () => {
@@ -64,12 +60,7 @@ const onSliderUpdate = () => {
   previewElement.style.filter = isDefault()
     ? DEFAULT_EFFECT.style
     : `${chosenEffect.style}(${sliderValue}${chosenEffect.measure})`;
-  levelEffectElement.value = sliderValue;
-};
-
-const resetEffectsSlider = () => {
-  removeSlider();
-  effectsElement.removeEventListener('change', onChangeEffect);
+  effectLevelElement.value = sliderValue;
 };
 
 const createSlider = () => {
@@ -86,9 +77,20 @@ const createSlider = () => {
   sliderElement.noUiSlider.on('update', onSliderUpdate);
 };
 
+const onEffectsElementChange = (evt) => {
+  chosenEffect = Effect[evt.target.value.toUpperCase()];
+  updateSlider();
+};
+
+const resetEffectsSlider = () => {
+  removeSlider();
+  effectsElement.removeEventListener('change', onEffectsElementChange);
+};
+
 const initEffectsSlider = () => {
   createSlider();
-  effectsElement.addEventListener('change', onChangeEffect);
+  effectsElement.addEventListener('change', onEffectsElementChange);
+  sliderElement.noUiSlider.on('update', onSliderUpdate);
 };
 
 const scalePicture = (value) => {
@@ -116,41 +118,9 @@ const initScale = () => {
   zoomInElement.addEventListener('click', onZoomInButtonClick);
 };
 
-const isValidFileType = () => {
-  const file = inputUploadElement.files[0];
-  const isValid = FILE_TYPES.some((type) => file.name.endsWith(type));
-  if (isValid) {
-    return true;
-  }
-};
-
-const pristine = new Pristine(formElement, {
-  classTo: 'img-upload__field-wrapper',
-  errorTextParent: 'img-upload__field-wrapper',
-});
-
-const isTextFieldFocused = () =>
-  document.activeElement === hashtagFieldElement ||
-  document.activeElement === descriptionFieldElement;
-
-const normilizeHashtags = (hashtagString) => hashtagString.trim().split(' ').filter((hashtag) => hashtag.length > 0);
-
-const validateDescription = (value) => value.length <= 140;
-
-const validateHashtagCount = (value) => normilizeHashtags(value).length <= MAX_HASHTAG_COUNT;
-
-const validateHashtagSymbols = (value) => normilizeHashtags(value).every((hashtag) => VALID_SYMBOLS.test(hashtag));
-
-const validateUniqueHashtag = (value) => {
-  const lowerCaseHashtags = normilizeHashtags(value).map((hashtag) => hashtag.toLowerCase());
-  return lowerCaseHashtags.length === new Set(lowerCaseHashtags).size;
-};
-
-const initValidation = () => {
-  pristine.addValidator(hashtagFieldElement, validateUniqueHashtag, ValidationErrorText.NOT_UNIQUE_HASHTAG);
-  pristine.addValidator(hashtagFieldElement, validateHashtagCount, ValidationErrorText.INVALID_HASHTAGS_COUNT);
-  pristine.addValidator(hashtagFieldElement, validateHashtagSymbols, ValidationErrorText.INVALID_PATTERN_HASHTAG);
-  pristine.addValidator(descriptionFieldElement, validateDescription, ValidationErrorText.INVALID_DESCRIPTION);
+const resetScale = () => {
+  zoomInElement.removeEventListener('click', onZoomInButtonClick);
+  zoomOutElement.removeEventListener('click', onZoomOutButtonClick);
 };
 
 const openEditPopup = () => {
@@ -163,16 +133,17 @@ const openEditPopup = () => {
 };
 
 const closeEditPopup = () => {
+  formElement.reset();
+  pristine.reset();
+  resetEffectsSlider();
+  resetScale();
+
   bodyElement.classList.remove('modal-open');
   overlayElement.classList.add('hidden');
 
   document.removeEventListener('keydown', onDocumentKeyDown);
   cancelButtonElement.removeEventListener('click', onCancelButtonClick);
   formElement.removeEventListener('submit', onFormElementSubmit);
-
-  formElement.reset();
-  pristine.reset();
-  resetEffectsSlider();
 };
 
 const toggleSubmitButton = (isDisabled = false) => {
@@ -197,7 +168,7 @@ function onFormElementSubmit(evt) {
 const onInputUploadElementChange = () => {
   if (isValidFileType()){
     openEditPopup();
-    initValidation();
+    loadPicture();
     initScale();
     initEffectsSlider();
   } else {

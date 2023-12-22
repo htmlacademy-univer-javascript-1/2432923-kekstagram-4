@@ -11,6 +11,9 @@ export const MIN_SCALE = 25;
 export const PERCENT_DIVIDER = 100;
 
 export const bodyElement = document.querySelector('body');
+export const inputUploadElement = bodyElement.querySelector('.img-upload__input');
+export const formElement = bodyElement.querySelector('.img-upload__form');
+
 
 export const SubmitButtonText = {
   DEFAULT: 'Опубликовать',
