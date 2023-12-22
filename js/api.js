@@ -12,8 +12,6 @@ const load = (route, errorText, method = Method.GET, body = null) =>
       throw new Error(errorText);
     });
 
-const getData = () => load(Route.GET_DATA, RequestErrorText.GET_DATA);
+export const getData = () => load(Route.GET_DATA, RequestErrorText.GET_DATA);
 
-const sendData = (body) => load(Route.SEND_DATA, RequestErrorText.SEND_DATA, Method.POST, body);
-
-export { getData, sendData };
+export const sendData = (body) => load(Route.SEND_DATA, RequestErrorText.SEND_DATA, Method.POST, body);

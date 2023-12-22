@@ -188,8 +188,6 @@ function onCancelButtonClick() {
   closeEditPopup();
 }
 
-const initEditPopup = () => {
+export const initEditPopup = () => {
   inputUploadElement.addEventListener('change', onInputUploadElementChange);
 };
-
-export { initEditPopup };
