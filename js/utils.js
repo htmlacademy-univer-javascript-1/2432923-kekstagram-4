@@ -1,4 +1,3 @@
-// import { ALERT_SHOW_TIME } from './consts.js';
 export const ALERT_SHOW_TIME = 5000;
 export const getRandomInteger = (a, b) => {
   const lower = Math.ceil(Math.min(a, b));
