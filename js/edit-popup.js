@@ -55,7 +55,7 @@ const updateSlider = () => {
   }
 };
 
-const onSliderUpdate = () => {
+const onSliderElementUpdate = () => {
   const sliderValue = sliderElement.noUiSlider.get();
   previewElement.style.filter = isDefault()
     ? DEFAULT_EFFECT.style
@@ -74,7 +74,7 @@ const createSlider = () => {
     step: DEFAULT_EFFECT.step,
     connect: 'lower',
   });
-  sliderElement.noUiSlider.on('update', onSliderUpdate);
+  sliderElement.noUiSlider.on('update', onSliderElementUpdate);
 };
 
 const onEffectsElementChange = (evt) => {
@@ -90,7 +90,7 @@ const resetEffectsSlider = () => {
 const initEffectsSlider = () => {
   createSlider();
   effectsElement.addEventListener('change', onEffectsElementChange);
-  sliderElement.noUiSlider.on('update', onSliderUpdate);
+  sliderElement.noUiSlider.on('update', onSliderElementUpdate);
 };
 
 const scalePicture = (value) => {
@@ -188,8 +188,6 @@ function onCancelButtonClick() {
   closeEditPopup();
 }
 
-const initEditPopup = () => {
+export const initEditPopup = () => {
   inputUploadElement.addEventListener('change', onInputUploadElementChange);
 };
-
-export { initEditPopup };

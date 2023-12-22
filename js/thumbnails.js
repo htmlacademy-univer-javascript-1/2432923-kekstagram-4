@@ -1,4 +1,4 @@
-import { showFullsizePicture } from './view-popup.js';
+import { openViewPopup } from './view-popup.js';
 
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const picturesContainerElement = document.querySelector('.pictures');
@@ -10,7 +10,7 @@ const onPicturesContainerClick = (evt) => {
   if (targetElement) {
     const id = targetElement.dataset.pictureId;
     const [thumbnail] = pictures.filter((picture) => picture.id === +id);
-    showFullsizePicture(thumbnail);
+    openViewPopup(thumbnail);
   }
 };
 

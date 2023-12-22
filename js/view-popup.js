@@ -64,7 +64,7 @@ const closeViewPopup = () => {
   destroyComments();
 };
 
-const openViewPopup = (picture) => {
+export const openViewPopup = (picture) => {
   comments = picture.comments.slice();
   renderPictureData(picture);
   initComments();
@@ -86,5 +86,3 @@ function onDocumentKeyDown(evt) {
 function onCancelButtonClick() {
   closeViewPopup();
 }
-
-export { openViewPopup as showFullsizePicture };
