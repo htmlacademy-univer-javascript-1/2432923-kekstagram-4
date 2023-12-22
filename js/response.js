@@ -44,13 +44,10 @@ function onOutsideClick (evt) {
   hideMessage();
 }
 
-const showSuccessMessage = () => {
+export const showSuccessMessage = () => {
   showMessage(successAlertElement, SUCCESS_BUTTON_SELECTOR);
 };
 
-const showErrorMessage = () => {
+export const showErrorMessage = () => {
   showMessage(errorAlertElement, ERROR_BUTTON_SELECTOR);
 };
-
-export {showSuccessMessage, showErrorMessage};
-

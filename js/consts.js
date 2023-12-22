@@ -14,7 +14,6 @@ export const bodyElement = document.querySelector('body');
 export const inputUploadElement = bodyElement.querySelector('.img-upload__input');
 export const formElement = bodyElement.querySelector('.img-upload__form');
 
-
 export const SubmitButtonText = {
   DEFAULT: 'Опубликовать',
   SENDING: 'Публикую...'
