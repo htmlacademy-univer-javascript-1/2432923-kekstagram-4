@@ -1,4 +1,4 @@
-import { shuffle } from './utils.js';
+import { debounce, shuffle } from './utils.js';
 import { initThumbnails, destroyThumbnails } from './thumbnails.js';
 import { MAX_COUNT_RANDOM_PICTURE, Filter } from './consts.js';
 
@@ -8,9 +8,8 @@ const ACTIVE_FILTER_CLASS = 'img-filters__button--active';
 const filtersContainerElement = document.querySelector('.img-filters');
 const filtersFormElement = filtersContainerElement.querySelector('.img-filters__form');
 
-let pictures = null;
+let pictures = [];
 let activeFilter = Filter.DEFAULT;
-let callback = null;
 
 const sortByCommentsCount = (pictureA, pictureB) => pictureB.comments.length - pictureA.comments.length;
 
@@ -24,25 +23,22 @@ const filterFunction = {
   [Filter.DISCUSSED]: getDiscussedPictures,
 };
 
-const getFilteredPictures = () => filterFunction[activeFilter]();
-
 const onFiltersFormClick = (evt) => {
   const id = evt.target.id;
   if (id && id !== activeFilter) {
     filtersFormElement.querySelector(`#${activeFilter}`).classList.remove(ACTIVE_FILTER_CLASS);
     evt.target.classList.add(ACTIVE_FILTER_CLASS);
     activeFilter = id;
-
+    const filteredPictures = filterFunction[activeFilter]();
     destroyThumbnails();
-    callback(getFilteredPictures());
+    initThumbnails(filteredPictures);
   }
 };
 
-export const initFilters = (data, cb) => {
+export const initFilters = (data) => {
   pictures = data.slice();
-  callback = cb;
   filtersContainerElement.classList.remove(HIDDEN_CONTAINER_CLASS);
-  filtersFormElement.addEventListener('click', onFiltersFormClick);
+  filtersFormElement.addEventListener('click', debounce(onFiltersFormClick));
 
   initThumbnails(pictures);
 };
