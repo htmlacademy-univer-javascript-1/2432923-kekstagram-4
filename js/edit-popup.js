@@ -5,6 +5,8 @@ import { Effect, PERCENT_DIVIDER, MIN_SCALE, MAX_SCALE, SCALE_STEP,
 import { isEscapeKey } from './utils.js';
 import { pristine, isValidFileType, isTextFieldFocused } from './validator.js';
 
+const DEFAULT_EFFECT = Effect['NONE'];
+
 const overlayElement = bodyElement.querySelector('.img-upload__overlay');
 const cancelButtonElement = overlayElement.querySelector('.img-upload__cancel');
 
@@ -18,8 +20,6 @@ const sliderElement = document.querySelector('.effect-level__slider');
 const sliderContainerElement = document.querySelector('.img-upload__effect-level');
 const effectLevelElement = document.querySelector('.effect-level__value');
 const submitButtonElement = formElement.querySelector('.img-upload__submit');
-
-const DEFAULT_EFFECT = Effect['NONE'];
 
 let chosenEffect = DEFAULT_EFFECT;
 
@@ -161,7 +161,10 @@ function onFormElementSubmit(evt) {
         showSuccessMessage();
       })
       .catch(showErrorMessage)
-      .finally(toggleSubmitButton);
+      .finally(() => {
+        closeEditPopup();
+        toggleSubmitButton();
+      });
   }
 }
 
